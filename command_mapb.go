@@ -1,43 +1,50 @@
 package main
 
 import (
-	"net/http"
-	"encoding/json"
-	"log"
 	"fmt"
+	"errors"
+	"encoding/json"
+  "github.com/bmamha/pokedexcli/internal/pokeapi"
 )
 
 
 
 func commandMapb(c *config) error {
-
-	   url := c.Previous
-    
-if 	*url != "" {
-     res, err := http.Get(*url)
-     if err != nil {
-			 log.Fatal(err)
+     
+	   if c.prevLocationsURL == nil {
+			 return errors.New("you are on the first page")
 		 }
-
-		 var locations Location
-
-		 defer res.Body.Close()
-
-		 decoder := json.NewDecoder(res.Body)
-		 if err := decoder.Decode(&locations); err != nil {
-			 log.Fatal(err)
-		 } 
-		 
-		for _, location := range locations.Results {
-			fmt.Printf("%v\n", location.Name)
-
+		cachedURL := *c.prevLocationsURL
+		if cachedData, ok := c.pokeClientCache.Get(cachedURL); !ok {
+    locationsResp, err := c.pokeapiClient.GetLocations(c.prevLocationsURL)
+    if err != nil {
+			return err
 		}
-		next_url := locations.Next 
-		c.Next = &next_url
-		prev_url := locations.Previous 
-		c.Previous = &prev_url} else {
-			fmt.Printf("You are on the first page!\n")
+
+		jsonData, err := json.Marshal(locationsResp)
+		if err != nil {
+			return err 
 		}
+
+		c.pokeClientCache.Add(cachedURL, jsonData)
+
+    c.nextLocationsURL = locationsResp.Next
+		c.prevLocationsURL = locationsResp.Previous 
+
+		for _, location := range locationsResp.Results {
+			fmt.Println(location.Name)
+    }
+		} else {
+			 var cachedResponse pokeapi.LocationArea 
+		    err := json.Unmarshal(cachedData, &cachedResponse)
+				if err != nil { 
+					return err 
+				}
+		    for _, cachedLocation := range cachedResponse.Results {
+			       fmt.Println(cachedLocation.Name)
+		    } 
+		}
+
 		return nil
 
 }

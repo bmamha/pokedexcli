@@ -1,6 +1,14 @@
 package main
+import (
+
+"github.com/bmamha/pokedexcli/internal/pokeapi"
+
+"github.com/bmamha/pokedexcli/internal/pokecache"
+)
 
 type config struct {
-	Next *string
-	Previous *string  
+	pokeapiClient pokeapi.Client
+	pokeClientCache *pokecache.Cache
+	nextLocationsURL *string
+	prevLocationsURL *string   
 }

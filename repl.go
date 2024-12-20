@@ -5,25 +5,24 @@ import (
 "fmt"
 "os"
 "strings"
-"log")
+"log"
+)
 
 
 
-func startRepl() {
-	next_url := "https://pokeapi.co/api/v2/location-area?offset=0&limit=20"
 
-	c := config{
-		Next: &next_url,
-		Previous: nil, 
-	}
-	scanner := bufio.NewScanner(os.Stdin)
-	for {
-  fmt.Print("Pokedex > ")
-  scanner.Scan()
-	err := scanner.Err()
-	if err != nil {
-		log.Fatal(err)
-	}
+func startRepl(cfg *config) {
+
+		scanner := bufio.NewScanner(os.Stdin)
+		
+  	for {
+        fmt.Print("Pokedex > ")
+        scanner.Scan()
+	      err := scanner.Err()
+	     
+				if err != nil {
+		     log.Fatal(err)
+	       }
 	text := scanner.Text()
 	words := CleanInput(text) 
   
@@ -33,7 +32,7 @@ func startRepl() {
 		fmt.Println("Unknown command")
 		continue 
 	} else {
-		err := command.callback(&c) 
+		err := command.callback(cfg) 
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -42,7 +41,7 @@ func startRepl() {
 	}
   
 }
-
+ 
 }
 
 type cliCommand struct {
