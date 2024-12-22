@@ -21,8 +21,8 @@ type cacheEntry struct {
 }
 
 
-func NewCache(timeinterval time.Duration) *Cache {
-	  cache := &Cache{
+func NewCache(timeinterval time.Duration) Cache {
+	  cache := Cache{
 			Timeout: timeinterval,
 			data: make(map[string]cacheEntry),
 		}

@@ -26,13 +26,18 @@ func startRepl(cfg *config) {
 	text := scanner.Text()
 	words := CleanInput(text) 
   
-	command, ok := getCommands()[words[0]]
+	commandName := words[0]
+	args := []string{}
+	if len(words) > 1 {
+		args = words[1:]
+}
+	command, ok := getCommands()[commandName]
 	
 	if !ok {
 		fmt.Println("Unknown command")
 		continue 
 	} else {
-		err := command.callback(cfg) 
+		err := command.callback(cfg, args...) 
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -47,7 +52,7 @@ func startRepl(cfg *config) {
 type cliCommand struct {
 	name string
 	description string
-	callback func(c *config) error 
+	callback func(c *config, args ...string) error 
 }
 
 func CleanInput(text string) []string {
@@ -81,6 +86,26 @@ func getCommands() map[string]cliCommand {
 	 callback: commandMapb,
  },
 
+ "explore": {
+	 name: "explore",
+	 description: "Displays pokemons in location area",
+	 callback: commandExplore,
+ },
+"catch": {
+	 name: "catch",
+	 description: "Attempts to catch Pokemon selected",
+	 callback: commandCatch,
+ },
+"pokedex": {
+	 name: "pokedex",
+	 description: "Lists caught pokemons",
+	 callback: commandPokedex,
+ },
+"inspect": {
+	 name: "inspect",
+	 description: "Prints the name, height, weight, stats and types of a caught Pokemon",
+	 callback: commandInspect,
+ },
 }
 }
  
